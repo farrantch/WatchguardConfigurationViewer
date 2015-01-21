@@ -6,10 +6,15 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Net;
 
-namespace FirewallConfigVisualizer
+namespace FireboxConfigVisualizer
 {
     public class Nat
     {
+        public Nat()
+        {
+            NatMembers = new List<NatMember>();
+        }
+
         [XmlElement("name")]
         public string Name { get; set; }
 
@@ -33,12 +38,12 @@ namespace FirewallConfigVisualizer
         public int Port { get; set; }
 
         [XmlElement("ext-addr-name")]
-        public int ExternalAddressName { get; set; }
+        public string ExternalAddressName { get; set; }
 
         [XmlElement("interface")]
-        public int Interface { get; set; }
+        public string Interface { get; set; }
 
         [XmlElement("addr-name")]
-        public int AddressName { get; set; }
+        public string AddressName { get; set; }
     }
 }

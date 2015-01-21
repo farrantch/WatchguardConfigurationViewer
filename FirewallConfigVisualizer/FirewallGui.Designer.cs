@@ -1,4 +1,4 @@
-﻿namespace FirewallConfigVisualizer
+﻿namespace FireboxConfigVisualizer
 {
     partial class FirewallGui
     {
@@ -49,7 +49,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.tbPolicyListCount = new System.Windows.Forms.Label();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -171,9 +170,9 @@
             // 
             // richTextBoxDescription
             // 
-            this.richTextBoxDescription.Location = new System.Drawing.Point(318, 538);
+            this.richTextBoxDescription.Location = new System.Drawing.Point(318, 553);
             this.richTextBoxDescription.Name = "richTextBoxDescription";
-            this.richTextBoxDescription.Size = new System.Drawing.Size(279, 113);
+            this.richTextBoxDescription.Size = new System.Drawing.Size(584, 84);
             this.richTextBoxDescription.TabIndex = 20;
             this.richTextBoxDescription.Text = "";
             // 
@@ -240,20 +239,11 @@
             this.tbPolicyListCount.Size = new System.Drawing.Size(0, 13);
             this.tbPolicyListCount.TabIndex = 25;
             // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(622, 536);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(280, 113);
-            this.richTextBox1.TabIndex = 26;
-            this.richTextBox1.Text = "";
-            // 
             // FirewallGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(922, 661);
-            this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.tbPolicyListCount);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -302,7 +292,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label tbPolicyListCount;
-        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
 

@@ -1,9 +1,9 @@
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\bin\Debug\FirewallConfigVisualizer.exe.config
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\bin\Debug\FirewallConfigVisualizer.exe
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\bin\Debug\FirewallConfigVisualizer.pdb
-c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FirewallConfigVisualizer.Properties.Resources.resources
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FirewallConfigVisualizer.csproj.GenerateResource.Cache
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FirewallConfigVisualizer.exe
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FirewallConfigVisualizer.pdb
-c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FirewallConfigVisualizer.FirewallGui.resources
 c:\users\farrantch.billsoft\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FirewallConfigVisualizer.csprojResolveAssemblyReference.cache
+C:\Users\farrantch.BILLSOFT\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FireboxConfigVisualizer.FirewallGui.resources
+C:\Users\farrantch.BILLSOFT\documents\visual studio 2012\Projects\FirewallConfigVisualizer\FirewallConfigVisualizer\obj\Debug\FireboxConfigVisualizer.Properties.Resources.resources

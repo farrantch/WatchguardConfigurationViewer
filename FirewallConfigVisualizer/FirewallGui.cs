@@ -15,7 +15,7 @@ using System.IO;
 using System.Xml.Serialization;
 using FireboxConfigVisualizer;
 
-namespace FirewallConfigVisualizer
+namespace FireboxConfigVisualizer
 {
     public partial class FirewallGui : Form
     {
@@ -74,6 +74,8 @@ namespace FirewallConfigVisualizer
             openFileDialog.InitialDirectory = Application.StartupPath;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                //ClearLists();
+                //UpdateListBoxes();
                 try
                 {
                     configFile = XDocument.Load(openFileDialog.FileName);
@@ -87,6 +89,9 @@ namespace FirewallConfigVisualizer
                     {
                         profile = (Profile)serializer.Deserialize(reader);
                     }
+
+                    SetAllMembersFalse();
+                    PopulateArrays();
                 }
 
                 catch (Exception)
@@ -94,16 +99,6 @@ namespace FirewallConfigVisualizer
                     MessageBox.Show("Load Failure");
                 }
             }
-
-            foreach (Alias a in profile.Aliases)
-                foreach (AliasMember am in a.AliasMembers)
-                    am.highlight = false;
-
-            foreach (Address ad in profile.Addresses)
-                foreach (AddressMember adm in ad.AddressMembers)
-                    adm.highlight = false;
-
-            PopulateArrays();
         }
 
         private void PopulateArrays()
@@ -430,6 +425,8 @@ namespace FirewallConfigVisualizer
                 AddressToList.Clear();
 
                 AliasMember alm = AliasToList[index];
+
+                //
                
                 // Address
                 if (alm.Type == 1)
@@ -447,23 +444,77 @@ namespace FirewallConfigVisualizer
                 }
 
                 // Alias
-                if (alm.Type == 2)
+                else if (alm.Type == 2)
                 {
-                    AliasMember alm2 = AliasToList[index];
+                    // snat
+                    if (alm.AliasName.Split('.').Last() == "snat")
+                    {
+                        foreach (Alias al in profile.Aliases)
+                        {
+                            foreach (AliasMember alm2 in al.AliasMembers)
+                            {
+                                if (alm2.AliasName == alm.AliasName)
+                                {
+                                    foreach (AbsPolicy absp in profile.AbsPolicies)
+                                    {
+                                        if (absp.ToAlias[0] == al.Name)
+                                        {
+                                            foreach (Nat nat in profile.Nats)
+                                            {
+                                                if (nat.Name == absp.PolicyNat)
+                                                {
+                                                    foreach (NatMember nm in nat.NatMembers)
+                                                    {
+                                                        //AddressMember added to listboxAddressTo
+                                                        AddressMember adm = new AddressMember();
+                                                        adm.Type = 4;
+                                                        foreach (Address address in profile.Addresses)
+                                                        {
+                                                            if (address.Name == nm.ExternalAddressName)
+                                                            {
+                                                                foreach (AddressMember adm2 in address.AddressMembers)
+                                                                {
+                                                                    adm.StartIPAddress = adm2.HostIPAddress;
+                                                                }
+                                                            }
+
+                                                            else if (address.Name == nm.AddressName)
+                                                            {
+                                                                foreach (AddressMember adm2 in address.AddressMembers)
+                                                                {
+                                                                    adm.EndIPAddress = adm2.HostIPAddress;
+                                                                }
+                                                            }
+                                                        }
+                                                        AddressToList.Add(adm);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    AliasMember alm3 = AliasToList[index];
 
                     foreach (Alias a in profile.Aliases)
                     {
-                        if (alm2.AliasName == a.Name)
+                        if (alm3.AliasName == a.Name)
                         {
-                            foreach (AliasMember am in a.AliasMembers)
+                            if (a.Name.Split('.').Last() != "snat")
                             {
-                                foreach (Address ad in profile.Addresses)
+                                foreach (AliasMember am in a.AliasMembers)
                                 {
-                                    if (am.Address == ad.Name)
+                                    foreach (Address ad in profile.Addresses)
                                     {
-                                        foreach (AddressMember addmem in ad.AddressMembers)
+                                        if (am.Address == ad.Name)
                                         {
-                                            AddressToList.Add(addmem);
+                                            foreach (AddressMember addmem in ad.AddressMembers)
+                                            {
+                                                AddressToList.Add(addmem);
+                                            }
                                         }
                                     }
                                 }
@@ -477,6 +528,8 @@ namespace FirewallConfigVisualizer
                 {
                     int selectedPolicy = listBoxPolicy.SelectedIndex;
                     AbsPolicy abs = AbsPolicyList[selectedPolicy];
+
+                    // Alias -> Address
                     foreach (Alias al in profile.Aliases)
                     {
                         if (al.Name == abs.ToAlias[0])
@@ -500,6 +553,7 @@ namespace FirewallConfigVisualizer
                         }
                     }
 
+                    // Alias -> Alias
                     int count = 0;
                     foreach (AliasMember alm2 in AliasToList)
                     {
@@ -509,14 +563,59 @@ namespace FirewallConfigVisualizer
                             {
                                 if (alm2.AliasName == al.Name)
                                 {
-                                    foreach (AliasMember alm3 in al.AliasMembers)
+                                    if (al.Name.Split('.').Last() == "snat")
                                     {
-                                        foreach (Address add in profile.Addresses)
+                                        /////////////////
+                                        foreach (AbsPolicy absp in profile.AbsPolicies)
                                         {
-                                            if (alm3.Address == add.Name)
+                                            if (absp.PolicyNat == al.Name.Split('.')[0])
                                             {
-                                                foreach (AddressMember adm in add.AddressMembers)
-                                                    AddressToList.Add(adm);
+                                                foreach (Nat nat in profile.Nats)
+                                                {
+                                                    if (nat.Name == absp.PolicyNat)
+                                                    {
+                                                        foreach (NatMember nm in nat.NatMembers)
+                                                        {
+                                                            //AddressMember added to listboxAddressTo
+                                                            AddressMember adm = new AddressMember();
+                                                            adm.Type = 4;
+                                                            foreach (Address address in profile.Addresses)
+                                                            {
+                                                                if (address.Name == nm.ExternalAddressName)
+                                                                {
+                                                                    foreach (AddressMember adm2 in address.AddressMembers)
+                                                                    {
+                                                                        adm.StartIPAddress = adm2.HostIPAddress;
+                                                                    }
+                                                                }
+
+                                                                else if (address.Name == nm.AddressName)
+                                                                {
+                                                                    foreach (AddressMember adm2 in address.AddressMembers)
+                                                                    {
+                                                                        adm.EndIPAddress = adm2.HostIPAddress;
+                                                                    }
+                                                                }
+                                                            }
+                                                            AddressToList.Add(adm);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        ///////////////////
+                                    }
+                                    else
+                                    {
+                                        foreach (AliasMember alm3 in al.AliasMembers)
+                                        {
+                                            foreach (Address add in profile.Addresses)
+                                            {
+                                                if (alm3.Address == add.Name)
+                                                {
+                                                    foreach (AddressMember adm in add.AddressMembers)
+                                                        AddressToList.Add(adm);
+                                                }
                                             }
                                         }
                                     }
@@ -630,11 +729,93 @@ namespace FirewallConfigVisualizer
 
                                     else if (adm.Type == 3)
                                     {
+                                        if (IPAddressExtensions.IsWithinRange(adm.StartIPAddress, adm.EndIPAddress, searchString))
+                                        {
+                                            adm.highlight = true;
+                                            alm.highlight = true;
+                                            AbsPolicyList.Add(absp);
+                                        }
 
                                     }
+                                    // SNAT aka: type = 4
+                                    else if (adm.Type == 4)
+                                    {
+                                        if (adm.StartIPAddress == searchString || adm.EndIPAddress == searchString)
+                                        {
+                                            adm.highlight = true;
+                                            alm.highlight = true;
+                                            AbsPolicyList.Add(absp);
+                                        }
+                                    }
+
                                     else
                                     {
 
+                                    }
+                                }
+                            }
+                        }
+                        // If Alias
+                        else if (alm.Type == 2)
+                        {
+                            foreach (Alias al2 in profile.Aliases)
+                            {
+                                if (alm.AliasName == al.Name)
+                                {
+                                    foreach (Address add in profile.Addresses.Where(y => y.Name == alm.Address))
+                                    {
+                                        foreach (AddressMember adm in add.AddressMembers)
+                                        {
+                                            // If Single Address
+                                            if (adm.Type == 1)
+                                            {
+                                                if (adm.HostIPAddress == searchString)
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+                                            }
+
+                                            else if (adm.Type == 2)
+                                            {
+                                                IPAddress network = IPAddress.Parse(adm.IPNetworkAddress);
+                                                IPAddress search = IPAddress.Parse(searchString);
+                                                IPAddress netmask = IPAddress.Parse(adm.NetMask);
+                                                if (IPAddressExtensions.IsInSameSubnet(network, search, netmask))
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+                                            }
+
+                                            else if (adm.Type == 3)
+                                            {
+                                                if (IPAddressExtensions.IsWithinRange(adm.StartIPAddress, adm.EndIPAddress, searchString))
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+
+                                            }
+                                            // SNAT aka: type = 4
+                                            else if (adm.Type == 4)
+                                            {
+                                                if (adm.StartIPAddress == searchString || adm.EndIPAddress == searchString)
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+                                            }
+
+                                            else
+                                            {
+
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -679,11 +860,93 @@ namespace FirewallConfigVisualizer
 
                                     else if (adm.Type == 3)
                                     {
+                                        if (IPAddressExtensions.IsWithinRange(adm.StartIPAddress, adm.EndIPAddress, searchString))
+                                        {
+                                            adm.highlight = true;
+                                            alm.highlight = true;
+                                            AbsPolicyList.Add(absp);
+                                        }
 
                                     }
+                                    // SNAT aka: type = 4
+                                    else if (adm.Type == 4)
+                                    {
+                                        if (adm.StartIPAddress == searchString || adm.EndIPAddress == searchString)
+                                        {
+                                            adm.highlight = true;
+                                            alm.highlight = true;
+                                            AbsPolicyList.Add(absp);
+                                        }
+                                    }
+
                                     else
                                     {
 
+                                    }
+                                }
+                            }
+                        }
+                        // If Alias
+                        else if (alm.Type == 2)
+                        {
+                            foreach (Alias al2 in profile.Aliases)
+                            {
+                                if (alm.AliasName == al.Name)
+                                {
+                                    foreach (Address add in profile.Addresses.Where(y => y.Name == alm.Address))
+                                    {
+                                        foreach (AddressMember adm in add.AddressMembers)
+                                        {
+                                            // If Single Address
+                                            if (adm.Type == 1)
+                                            {
+                                                if (adm.HostIPAddress == searchString)
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+                                            }
+
+                                            else if (adm.Type == 2)
+                                            {
+                                                IPAddress network = IPAddress.Parse(adm.IPNetworkAddress);
+                                                IPAddress search = IPAddress.Parse(searchString);
+                                                IPAddress netmask = IPAddress.Parse(adm.NetMask);
+                                                if (IPAddressExtensions.IsInSameSubnet(network, search, netmask))
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+                                            }
+
+                                            else if (adm.Type == 3)
+                                            {
+                                                if (IPAddressExtensions.IsWithinRange(adm.StartIPAddress, adm.EndIPAddress, searchString))
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+
+                                            }
+                                            // SNAT aka: type = 4
+                                            else if (adm.Type == 4)
+                                            {
+                                                if (adm.StartIPAddress == searchString || adm.EndIPAddress == searchString)
+                                                {
+                                                    adm.highlight = true;
+                                                    alm.highlight = true;
+                                                    AbsPolicyList.Add(absp);
+                                                }
+                                            }
+
+                                            else
+                                            {
+
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -692,6 +955,7 @@ namespace FirewallConfigVisualizer
                 }
             }
 
+            AbsPolicyList = AbsPolicyList.Distinct().ToList();
             UpdateListBoxes();
             tbPolicyListCount.Text = AbsPolicyList.Count + " policies";
             listBoxAliasFrom.SelectedIndex = 0;

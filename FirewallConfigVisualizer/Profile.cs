@@ -17,6 +17,7 @@ namespace FireboxConfigVisualizer
             AbsPolicies = new List<AbsPolicy>();
             Aliases = new List<Alias>();
             Addresses = new List<Address>();
+            Nats = new List<Nat>();
         }
 
         [XmlArray("policy-list")]
@@ -38,5 +39,9 @@ namespace FireboxConfigVisualizer
         [XmlArray("abs-policy-list")]
         [XmlArrayItem("abs-policy")]
         public List<AbsPolicy> AbsPolicies { get; set; }
+
+        [XmlArray("nat-list")]
+        [XmlArrayItem("nat")]
+        public List<Nat> Nats { get; set; }
     }
 }

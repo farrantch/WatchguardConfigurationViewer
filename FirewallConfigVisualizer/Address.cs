@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Net;
-using FirewallConfigVisualizer;
+using FireboxConfigVisualizer;
 
 namespace FireboxConfigVisualizer
 {
@@ -70,6 +70,8 @@ namespace FireboxConfigVisualizer
             }
             else if (Type == 3)
                 return StartIPAddress + " - " + EndIPAddress;
+            else if (Type == 4)
+                return StartIPAddress + " -- NAT --> " + EndIPAddress;
             else
                 return "";
         }

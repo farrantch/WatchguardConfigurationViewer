@@ -49,11 +49,32 @@ namespace FireboxConfigVisualizer{
             return network1.Equals(network2);
         }
 
-        //public static bool IsAddressBetweenTwoAddresses(IPAddress addressLow, IPAddress addressHigh, IPAddress search)
-        //{
-        //    byte[] addressLowBytes = addressLow.GetAddressBytes();
-        //    byte[] addressHighBytes = addressHigh.GetAddressBytes();
-        //    byte[] searchBytes = search.GetAddressBytes();
-        //}
+        public static bool IsWithinRange(string addressLow, string addressHigh, string search)
+        {
+            long addressLowLong = IP2Long(addressLow);
+            long addressHighLong = IP2Long(addressHigh);
+            long searchLong = IP2Long(search);
+
+            if (searchLong >= addressLowLong && searchLong <= addressHighLong)
+                return true;
+            else
+                return false;
+
+        }
+
+        public static long IP2Long(string ip)
+        {
+            string[] ipBytes;
+            double num = 0;
+            if (!string.IsNullOrEmpty(ip))
+            {
+                ipBytes = ip.Split('.');
+                for (int i = ipBytes.Length - 1; i >= 0; i--)
+                {
+                    num += ((int.Parse(ipBytes[i]) % 256) * Math.Pow(256, (3 - i)));
+                }
+            }
+            return (long)num;
+        }
     }
 }
