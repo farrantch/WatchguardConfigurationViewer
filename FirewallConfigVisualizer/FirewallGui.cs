@@ -69,6 +69,8 @@ namespace FireboxConfigVisualizer
 
         private void bnLoad_Click(object sender, EventArgs e)
         {
+            ClearLists();
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Firebox Config File|*.xml";
             openFileDialog.InitialDirectory = Application.StartupPath;
@@ -124,6 +126,9 @@ namespace FireboxConfigVisualizer
             bool selected = ((e.State & DrawItemState.Selected) == DrawItemState.Selected);
 
             int index = e.Index;
+
+            if (listBoxPolicy.Items.Count != AbsPolicyList.Count())
+                index = 0;
             if (index >= 0 && index < listBoxPolicy.Items.Count)
             {
                 string text = listBoxPolicy.Items[index].ToString();
@@ -356,12 +361,18 @@ namespace FireboxConfigVisualizer
                     }
                 }
 
+                else if (AbsPolicyList.Count() == 0)
+                {
+
+                }
+
                 // All Addresses
                 else
                 {
-                    int selectedPolicy = listBoxPolicy.SelectedIndex;
-                    AbsPolicy abs = AbsPolicyList[selectedPolicy];
-                    var test = 0;
+                    if (listBoxPolicy.Items.Count != AbsPolicyList.Count)
+                        listBoxPolicy.SelectedIndex = 0;
+                    AbsPolicy abs = AbsPolicyList[listBoxPolicy.SelectedIndex];
+
                     foreach (Alias al in profile.Aliases)
                     {
                         if (al.Name == abs.FromAlias[0])
@@ -425,8 +436,6 @@ namespace FireboxConfigVisualizer
                 AddressToList.Clear();
 
                 AliasMember alm = AliasToList[index];
-
-                //
                
                 // Address
                 if (alm.Type == 1)
@@ -523,11 +532,17 @@ namespace FireboxConfigVisualizer
                     }
                 }
 
+                else if (AbsPolicyList.Count() == 0)
+                {
+
+                }
+
                 // All Addresses
                 else
                 {
-                    int selectedPolicy = listBoxPolicy.SelectedIndex;
-                    AbsPolicy abs = AbsPolicyList[selectedPolicy];
+                    if (listBoxPolicy.Items.Count != AbsPolicyList.Count)
+                        listBoxPolicy.SelectedIndex = 0;
+                    AbsPolicy abs = AbsPolicyList[listBoxPolicy.SelectedIndex];
 
                     // Alias -> Address
                     foreach (Alias al in profile.Aliases)
@@ -665,15 +680,17 @@ namespace FireboxConfigVisualizer
 
             if (tbSearch.Text.Length < 1)
                 MessageBox.Show("Search Empty");
-
-            else if (IPAddress.TryParse(tbSearch.Text, out ip))
-            {
-                SearchIpAddress(tbSearch.Text);
-            }
-
             else
-                SearchText(tbSearch.Text);
+            {
+                listBoxPolicy.DataSource = null;
+                listBoxPolicy.DataSource = AbsPolicyList;            
 
+                if (IPAddress.TryParse(tbSearch.Text, out ip))
+                    SearchIpAddress(tbSearch.Text);
+
+                else
+                    SearchText(tbSearch.Text);
+            }
         }
 
         private void SearchText(string p)
@@ -960,7 +977,9 @@ namespace FireboxConfigVisualizer
             tbPolicyListCount.Text = AbsPolicyList.Count + " policies";
             listBoxAliasFrom.SelectedIndex = 0;
             listBoxAliasTo.SelectedIndex = 0;
-            listBoxPolicy.SelectedIndex = 0;
+
+            if (AbsPolicyList.Count() != 0)
+                listBoxPolicy.SelectedIndex = 0;
         }
 
         private void FirewallGui_Load(object sender, EventArgs e)
@@ -974,6 +993,7 @@ namespace FireboxConfigVisualizer
             SetAllMembersFalse();
             PopulateArrays();
             UpdateListBoxes();
+            listBoxPolicy.SelectedIndex = 0;
         }
 
         private void ClearLists()
@@ -1028,6 +1048,14 @@ namespace FireboxConfigVisualizer
             foreach (Address ad in profile.Addresses)
                 foreach (AddressMember adm in ad.AddressMembers)
                     adm.highlight = false;
+        }
+
+        private void tbSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                bnSearch_Click(this, new EventArgs());
+            }
         }
     }
 }
